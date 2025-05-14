@@ -1,4 +1,4 @@
-name: 🚀 Deploy Laravel Public to InfinityFree
+name: Deploy Laravel Public to InfinityFree
 
 on:
   push:
@@ -7,21 +7,34 @@ on:
 
 jobs:
   ftp-deploy:
-    name: 📤 FTP Deploy
+    name: FTP Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Repository Clone
+      - name: Repository Clone
         uses: actions/checkout@v3
 
-      - name: ⚙️ Composer Install (without dev dependencies)
+      - name: Composer Install (without dev dependencies)
         run: composer install --no-dev --optimize-autoloader
 
-      - name: 🚀 Upload public folder to InfinityFree
+      - name: Upload Laravel app files (excluding public) to /htdocs/laravel/
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./public
+          local-dir: ./
+          server-dir: /htdocs/laravel/
+          exclude: |
+            **/public/**
+            **/.git/**
+            **/.github/**
+
+      - name: Upload public folder contents to /htdocs/
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./public/
           server-dir: /htdocs/
