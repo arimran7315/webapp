@@ -1,0 +1,27 @@
+name: 🚀 Deploy Laravel Public to InfinityFree
+
+on:
+  push:
+    branches:
+      - main  # ya jis branch se deploy karna ho
+
+jobs:
+  ftp-deploy:
+    name: 📤 FTP Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Repository Clone
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Composer Install (without dev dependencies)
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: 🚀 Upload public folder to InfinityFree
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./public
+          server-dir: /htdocs/
